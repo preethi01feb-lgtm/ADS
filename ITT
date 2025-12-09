@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Create node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Stack implementation
+struct Stack {
+    struct Node* data[100];
+    int top;
+};
+
+void push(struct Stack* s, struct Node* node) {
+    s->data[++s->top] = node;
+}
+
+struct Node* pop(struct Stack* s) {
+    return s->data[s->top--];
+}
+
+int isEmpty(struct Stack* s) {
+    return s->top == -1;
+}
+
+/* ----------------------------------------
+   1. ITERATIVE INORDER (Left, Root, Right)
+   ---------------------------------------- */
+void inorderIterative(struct Node* root) {
+    struct Stack s;
+    s.top = -1;
+
+    struct Node* curr = root;
+
+    while (curr != NULL || !isEmpty(&s)) {
+        while (curr != NULL) {
+            push(&s, curr);
+            curr = curr->left;
+        }
+
+        curr = pop(&s);
+        printf("%d ", curr->data);
+
+        curr = curr->right;
+    }
+}
+
+/* ----------------------------------------
+   2. ITERATIVE PREORDER (Root, Left, Right)
+   ---------------------------------------- */
+void preorderIterative(struct Node* root) {
+    if (root == NULL) return;
+
+    struct Stack s;
+    s.top = -1;
+
+    push(&s, root);
+
+    while (!isEmpty(&s)) {
+        struct Node* node = pop(&s);
+        printf("%d ", node->data);
+
+        if (node->right)
+            push(&s, node->right);
+
+        if (node->left)
+            push(&s, node->left);
+    }
+}
+
+/* ----------------------------------------
+   3. ITERATIVE POSTORDER (Left, Right, Root)
+      Using TWO stacks
+   ---------------------------------------- */
+void postorderIterative(struct Node* root) {
+    if (root == NULL) return;
+
+    struct Stack s1, s2;
+    s1.top = s2.top = -1;
+
+    push(&s1, root);
+
+    while (!isEmpty(&s1)) {
+        struct Node* temp = pop(&s1);
+        push(&s2, temp);
+
+        if (temp->left)
+            push(&s1, temp->left);
+        if (temp->right)
+            push(&s1, temp->right);
+    }
+
+    while (!isEmpty(&s2)) {
+        printf("%d ", pop(&s2)->data);
+    }
+}
+
+int main() {
+    /* Tree used:
+             1
+            / \
+           2   3
+          / \
+         4   5
+    */
+
+    struct Node* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->left->right = createNode(5);
+
+    printf("Iterative Inorder: ");
+    inorderIterative(root);
+
+    printf("\nIterative Preorder: ");
+    preorderIterative(root);
+
+    printf("\nIterative Postorder: ");
+    postorderIterative(root);
+
+    return 0;
+}
