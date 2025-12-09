@@ -1,0 +1,70 @@
+#include <stdio.h>
+
+#define INF 9999
+#define MAX 20
+
+int main() {
+    int n;
+    int cost[MAX][MAX], distance[MAX], visited[MAX];
+    int i, j, count, mindistance, nextnode, start;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix (0 for no edge):\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+            if (cost[i][j] == 0)
+                cost[i][j] = INF;   // Replace 0 with INF (except diagonal)
+            if (i == j)
+                cost[i][j] = 0;
+        }
+    }
+
+    printf("Enter the starting vertex: ");
+    scanf("%d", &start);
+
+    // Initialize distance and visited arrays
+    for (i = 0; i < n; i++) {
+        distance[i] = cost[start][i];
+        visited[i] = 0;
+    }
+
+    distance[start] = 0;
+    visited[start] = 1;
+    count = 1;
+
+    // Dijkstra's main loop
+    while (count < n) {
+        mindistance = INF;
+
+        // Find the next minimum-distance unvisited node
+        for (i = 0; i < n; i++) {
+            if (!visited[i] && distance[i] < mindistance) {
+                mindistance = distance[i];
+                nextnode = i;
+            }
+        }
+
+        visited[nextnode] = 1;
+
+        // Update distances of adjacent nodes
+        for (i = 0; i < n; i++) {
+            if (!visited[i] && 
+                mindistance + cost[nextnode][i] < distance[i]) {
+                distance[i] = mindistance + cost[nextnode][i];
+            }
+        }
+
+        count++;
+    }
+
+    // Print result
+    printf("\nShortest distances from vertex %d:\n", start);
+    for (i = 0; i < n; i++) {
+        printf("To %d = %d\n", i, distance[i]);
+    }
+
+    return 0;
+}
